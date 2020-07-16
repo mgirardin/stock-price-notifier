@@ -3,16 +3,20 @@ using System.Threading.Tasks;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using Microsoft.Extensions.Configuration;
+
 
 namespace StockPriceNotifier
 {
     public class StockPriceScheduler : IStockPriceScheduler {
 
-        IScheduler _scheduler = null;
-        IJobFactory _jobFactory = null;
+        private IScheduler _scheduler = null;
+        private IJobFactory _jobFactory = null;
+        private int _polling_interval;
 
-        public StockPriceScheduler(IJobFactory jobFactory){
+        public StockPriceScheduler(IJobFactory jobFactory, IConfiguration config){
             _jobFactory = jobFactory;
+            _polling_interval = config.GetValue<int>("PollingInterval");
         }
 
         public async Task Start(){
@@ -40,7 +44,7 @@ namespace StockPriceNotifier
             ITrigger trigger = TriggerBuilder.Create()
                 .StartNow()
                 .WithSimpleSchedule(x => x
-                    .WithIntervalInSeconds(60)
+                    .WithIntervalInSeconds(_polling_interval)
                     .RepeatForever())
                 .Build();
             await _scheduler.ScheduleJob(job, trigger);
