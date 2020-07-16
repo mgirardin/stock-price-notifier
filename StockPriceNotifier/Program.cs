@@ -3,12 +3,13 @@ using System.IO;
 using System.Threading;
 using CommandDotNet;
 using CommandDotNet.IoC.MicrosoftDependencyInjection;
+using CommandDotNet.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace StockPriceNotifier
 {
-    class Program
+    public class Program
     {    
         private static ManualResetEvent _quitEvent = new ManualResetEvent(false);
         private static IServiceProvider _serviceProvider;
@@ -30,6 +31,7 @@ namespace StockPriceNotifier
         {
             AppRunner<Commands> appRunner = new AppRunner<Commands>();
             appRunner.UseMicrosoftDependencyInjection(serviceProvider)
+                     .UseDataAnnotationValidations(showHelpOnError: true)
                      .UseTypoSuggestions();
             return appRunner;
         }
