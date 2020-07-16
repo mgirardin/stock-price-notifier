@@ -24,7 +24,7 @@ namespace StockPriceNotifier
                 }
                 else if(stockPrice < float.Parse(minPrice) && status != "BUY"){
                     status = "BUY";
-                    _mailService.SendEmail("", "Venda - Stock " + stockName); // TODO: Use template for email
+                    _mailService.SendEmail("", "Compra - Stock " + stockName); // TODO: Use template for email
                 }
             }
             catch(Exception e){
