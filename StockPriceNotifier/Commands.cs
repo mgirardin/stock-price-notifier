@@ -7,6 +7,12 @@ namespace StockPriceNotifier
 {
     public class Commands
     {
+        IStockPriceScheduler _scheduler;
+        
+        public Commands(IStockPriceScheduler scheduler){
+            _scheduler = scheduler;
+        }
+
         [DefaultMethod]
         [Command(Name="subscribe", Description = "Create threshold values for specific stock")]
         public async void Subscribe(IConsole console,            
@@ -20,6 +26,8 @@ namespace StockPriceNotifier
             [Required(ErrorMessage = "Minimum stock price is required.")]  
             float minPrice)
         {
+            await _scheduler.Start();
+            await _scheduler.ScheduleStockPriceJob(stockName, maxPrice, minPrice);
             console.WriteLine(String.Format("Stock {0} job added succesfully.", stockName));
         }
     }
