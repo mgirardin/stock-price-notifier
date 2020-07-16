@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using MimeKit;
 using Microsoft.Extensions.Configuration;
+using MailKit.Security;
 
 namespace StockPriceNotifier
 {
@@ -19,21 +20,22 @@ namespace StockPriceNotifier
             String EmailHost             = _config.GetValue<string>("EmailHost"); 
             int EmailHostPort            = _config.GetValue<int>("EmailHostPort");
             List<String> toEmailAdresses = _config.GetSection("EmailAddresses").Get<List<string>>();
-            
+
             var message = new MimeMessage{
                 Subject = subject
             };
-                message.From.Add(new MailboxAddress(FromEmailName, fromEmailAdress));
-                foreach(String email in toEmailAdresses){
-                    message.To.Add(new MailboxAddress("", email));
-                }
-                message.Body = new TextPart("plain")
-                {
-                    Text = emailBody
-                };
-            try{
+            
+            message.From.Add(new MailboxAddress(FromEmailName, fromEmailAdress));
+            foreach(String email in toEmailAdresses){
+                message.To.Add(new MailboxAddress("", email));
+            }
+            message.Body = new TextPart("plain")
+            {
+                Text = emailBody
+            };
+            try{           
                 using (var client = new MailKit.Net.Smtp.SmtpClient()){
-                    client.Connect(EmailHost, EmailHostPort, false);
+                    client.Connect(EmailHost, EmailHostPort, SecureSocketOptions.StartTls);
                     client.Authenticate(fromEmailAdress, FromEmailPassword);
                     client.Send(message);
                     client.Disconnect(true);
