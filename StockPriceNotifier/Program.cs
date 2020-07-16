@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using CommandDotNet;
 using CommandDotNet.IoC.MicrosoftDependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +10,7 @@ namespace StockPriceNotifier
 {
     class Program
     {    
+        private static ManualResetEvent _quitEvent = new ManualResetEvent(false);
         private static IServiceProvider _serviceProvider;
 
         static void Main(string[] args)
@@ -17,7 +19,11 @@ namespace StockPriceNotifier
 
             BuildAppRunner(_serviceProvider).Run(args);
 
-            DisposeServices();
+            Console.CancelKeyPress += delegate {
+                DisposeServices();
+            };
+
+            _quitEvent.WaitOne();
         }
 
         public static AppRunner<Commands> BuildAppRunner(IServiceProvider serviceProvider)
