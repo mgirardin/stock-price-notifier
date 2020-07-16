@@ -42,6 +42,7 @@ namespace StockPriceNotifier
             var config = LoadConfiguration();
             collection.AddSingleton(config);        
             collection.AddSingleton<Commands, Commands>();
+            collection.AddHttpClient();
             _serviceProvider = collection.BuildServiceProvider();
         }
 
