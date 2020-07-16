@@ -6,14 +6,25 @@ namespace StockPriceNotifier
 {
     [PersistJobDataAfterExecution]
     public class StockPriceJob : IJob {
-        private string handleStockPriceNotification(string stockName, string maxPrice, string minPrice, string status){
+
+        IMailService _mailService;
+        IStockAPI _api;
+
+        public StockPriceJob(IMailService mailService, IStockAPI api){
+            _mailService = mailService;
+            _api = api;
+        }
+        
+        private async Task<string> handleStockPriceNotification(string stockName, string maxPrice, string minPrice, string status){
             try{
-                var stockPrice = 15;
+                var stockPrice = await _api.getStockPrice(stockName);
                 if(stockPrice > float.Parse(maxPrice) && status != "SELL"){
                     status = "SELL";
+                    _mailService.SendEmail("", "Venda - Stock " + stockName); // TODO: Use template for email
                 }
                 else if(stockPrice < float.Parse(minPrice) && status != "BUY"){
                     status = "BUY";
+                    _mailService.SendEmail("", "Venda - Stock " + stockName); // TODO: Use template for email
                 }
             }
             catch(Exception e){
@@ -29,8 +40,7 @@ namespace StockPriceNotifier
             string maxPrice = dataMap.GetString("maxPrice");
             string minPrice = dataMap.GetString("minPrice");
             string status = dataMap.GetString("status");
-
-            dataMap["status"] = handleStockPriceNotification(stockName, maxPrice, minPrice, status);
+            dataMap["status"] = await handleStockPriceNotification(stockName, maxPrice, minPrice, status);
         }
     }
 }

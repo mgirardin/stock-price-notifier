@@ -6,6 +6,7 @@ using CommandDotNet.IoC.MicrosoftDependencyInjection;
 using CommandDotNet.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz.Spi;
 
 namespace StockPriceNotifier
 {
@@ -43,6 +44,10 @@ namespace StockPriceNotifier
             collection.AddSingleton(config);        
             collection.AddSingleton<Commands, Commands>();
             collection.AddSingleton<IStockPriceScheduler, StockPriceScheduler>();
+            collection.AddSingleton<StockPriceJob, StockPriceJob>();
+            collection.AddSingleton<IJobFactory, JobFactory>();
+            collection.AddSingleton<IMailService, MailService>();
+            collection.AddSingleton<IStockAPI, HGBrasilAPI>();
             collection.AddHttpClient();
             _serviceProvider = collection.BuildServiceProvider();
         }

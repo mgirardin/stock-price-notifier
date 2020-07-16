@@ -9,6 +9,11 @@ namespace StockPriceNotifier
     public class StockPriceScheduler : IStockPriceScheduler {
 
         IScheduler _scheduler = null;
+        IJobFactory _jobFactory = null;
+
+        public StockPriceScheduler(IJobFactory jobFactory){
+            _jobFactory = jobFactory;
+        }
 
         public async Task Start(){
             try{
@@ -17,6 +22,7 @@ namespace StockPriceNotifier
                 }
                 StdSchedulerFactory factory = new StdSchedulerFactory();
                 _scheduler = await factory.GetScheduler();
+                _scheduler.JobFactory = _jobFactory;
                 await _scheduler.Start();
             }
             catch (SchedulerException se)
